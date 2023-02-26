@@ -104,16 +104,11 @@ int main(void)
   {
     /* USER CODE END WHILE */
   uint8_t status = 0;
-  float vref_ratio=1, temperature=0;
+  float vref_ratio=1, vref, temperature=0;
   uint16_t adc_value;
 
   while (1)
   {
-	toggleTemperature(0);
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
- 	adc_value = HAL_ADC_GetValue(&hadc1);
-	vref_ratio = (float)VREFINT / (float)HAL_ADC_GetValue(&hadc1);
 
 	status = HAL_GPIO_ReadPin(myButton_GPIO_Port, myButton_Pin);
 	if(status == 0)
@@ -127,6 +122,12 @@ int main(void)
 
 	}else{
 		HAL_GPIO_WritePin(myLed_GPIO_Port, myLed_Pin, GPIO_PIN_RESET);
+		toggleTemperature(0);
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	 	adc_value = HAL_ADC_GetValue(&hadc1);
+		vref_ratio = (float)VREFINT / (float)HAL_ADC_GetValue(&hadc1);
+		vref = vref_ratio * 3;
 	}
 
   }
@@ -229,7 +230,7 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_VREFINT;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_47CYCLES_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_12CYCLES_5;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
@@ -254,7 +255,7 @@ static void toggleTemperature(int temperature)
 	}
 
 	sConfig.Rank = ADC_REGULAR_RANK_1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_47CYCLES_5;
+	sConfig.SamplingTime = ADC_SAMPLETIME_12CYCLES_5;
 	sConfig.SingleDiff = ADC_SINGLE_ENDED;
 	sConfig.OffsetNumber = ADC_OFFSET_NONE;
 	sConfig.Offset = 0;
